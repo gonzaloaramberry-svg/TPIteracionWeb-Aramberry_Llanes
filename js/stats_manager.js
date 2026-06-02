@@ -25,6 +25,13 @@ function StatsManager() {
   this.socket.onclose = function() {
     console.log("WebSocket cerrado");
   };
+  this.socket.onmessage = function(mensaje) {
+
+  let datos = JSON.parse(mensaje.data);
+
+  console.log(datos);
+
+  };
 }
 
 // Guardar estadísticas
