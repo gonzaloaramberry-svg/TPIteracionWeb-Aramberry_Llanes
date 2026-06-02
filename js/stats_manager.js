@@ -62,6 +62,8 @@ StatsManager.prototype.registrarEvento = function (evento, valor) {
         this.stats.mejorPuntaje = valor;
       }
       break;
+
+    this.enviarEventoWebSocket(evento, valor);
     
   }
 
@@ -69,4 +71,18 @@ StatsManager.prototype.registrarEvento = function (evento, valor) {
 
   console.log("Evento registrado:", evento);
   console.log(this.stats);
+};
+StatsManager.prototype.enviarEventoWebSocket = function(evento, valor) {
+
+  if (this.socket.readyState === WebSocket.OPEN) {
+
+    const datos = {
+      game: "2048",
+      event: evento,
+      player: "Augusto",
+      value: valor || 0
+    };
+
+    this.socket.send(JSON.stringify(datos));
+  }
 };
