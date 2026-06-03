@@ -25,11 +25,13 @@ function StatsManager() {
   this.socket.onclose = function() {
     console.log("WebSocket cerrado");
   };
-  this.socket.onmessage = function(mensaje) {
+   this.socket.onmessage = function(mensaje) {
 
-  let datos = JSON.parse(mensaje.data);
+    let datos = JSON.parse(mensaje.data);
 
-  console.log(datos);
+    console.log(
+      JSON.stringify(datos, null, 2)
+  );
 
   if (!Array.isArray(datos)) 
   return;
@@ -92,10 +94,9 @@ StatsManager.prototype.registrarEvento = function (evento, valor) {
         this.stats.mejorPuntaje = valor;
       }
       break;
-
-    this.enviarEventoWebSocket(evento, valor);
-    
   }
+
+  this.enviarEventoWebSocket(evento, valor);
 
   this.guardar();
 
