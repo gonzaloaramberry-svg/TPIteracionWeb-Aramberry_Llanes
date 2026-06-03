@@ -1,5 +1,10 @@
 function StatsManager() {
 
+  this.playerName = prompt("Ingresá tu nombre") || "Jugador";
+
+  this.statsKey = "gameStats";
+  };
+
   this.statsKey = "gameStats";
 
   this.stats = JSON.parse(localStorage.getItem(this.statsKey)) || {
@@ -110,7 +115,7 @@ StatsManager.prototype.enviarEventoWebSocket = function(evento, valor) {
     const datos = {
       game: "2048",
       event: evento,
-      player: "Augusto",
+      player: this.playername,
       value: valor || 0
     };
 
