@@ -11,7 +11,7 @@ function StatsManager() {
     combinaciones: 0
   };
     this.socket = new WebSocket(
-    "wss://gamehubmanager.azurewebsites.net/ws"
+    "wss://echo.websocket.org"
   );
 
   this.socket.onopen = function() {
