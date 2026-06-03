@@ -31,6 +31,29 @@ function StatsManager() {
 
   console.log(datos);
 
+  if (!Array.isArray(datos)) 
+  return;
+
+
+  let lista = document.getElementById("ranking-list");
+
+  lista.innerHTML = "";
+
+  datos.forEach(function(jugador, index) {
+
+    let item = document.createElement("li");
+
+    item.textContent =
+      (index + 1) +
+      ". " +
+      jugador.Player +
+      " - " +
+      jugador.Value;
+
+    lista.appendChild(item);
+
+  });
+
   };
 }
 
