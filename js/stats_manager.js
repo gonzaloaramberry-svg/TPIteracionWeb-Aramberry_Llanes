@@ -53,7 +53,7 @@ StatsManager.prototype.guardar = function () {
 };
 
 // Registrar eventos
-StatsManager.prototype.registrarEvento = function (evento, valor) {
+StatsManager.prototype.enviarEventoWebSocket = function(evento, valor) {
   console.log(this);
   console.log(this.stats);
 
