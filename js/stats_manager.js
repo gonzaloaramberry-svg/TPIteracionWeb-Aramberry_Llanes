@@ -1,7 +1,6 @@
 function StatsManager() {
-
+  this.playerName = prompt("Ingresá tu nombre") || "Jugador";
   this.statsKey = "gameStats";
-
   this.stats = JSON.parse(localStorage.getItem(this.statsKey)) || {
     partidas: 0,
     movimientos: 0,
@@ -54,13 +53,15 @@ StatsManager.prototype.guardar = function () {
 };
 
 // Registrar eventos
-StatsManager.prototype.registrarEvento = function(evento, valor) {
+StatsManager.prototype.registrarEvento = function (evento, valor) {
+  console.log(this);
   console.log(this.stats);
 
-  switch(evento) {
+  switch (evento) {
     case "partida":
       this.stats.partidas++;
       break;
+
     case "movimiento":
       this.stats.movimientos++;
       break;
@@ -83,15 +84,10 @@ StatsManager.prototype.registrarEvento = function(evento, valor) {
       }
       break;
   }
-StatsManager.prototype.registrarEvento = function(evento, valor) {
 
-
+  this.enviarEventoWebSocket(evento, valor);
 
   this.guardar();
-
-  this.enviarEventoWebSocket(evento, valor); 
-
-};
 
   console.log("Evento registrado:", evento);
   console.log(this.stats);
