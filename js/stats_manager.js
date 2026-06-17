@@ -53,11 +53,10 @@ StatsManager.prototype.guardar = function () {
 };
 
 // Registrar eventos
-StatsManager.prototype.enviarEventoWebSocket = function(evento, valor) {
-  console.log(this);
-  console.log(this.stats);
+StatsManager.prototype.registrarEvento = function (evento, valor) {
 
   switch (evento) {
+
     case "partida":
       this.stats.partidas++;
       break;
@@ -91,4 +90,24 @@ StatsManager.prototype.enviarEventoWebSocket = function(evento, valor) {
 
   console.log("Evento registrado:", evento);
   console.log(this.stats);
+};
+
+// Enviar eventos por WebSocket
+StatsManager.prototype.enviarEventoWebSocket = function (evento, valor) {
+
+  if (this.socket.readyState === WebSocket.OPEN) {
+
+    let datos = {
+      game: "2048",
+      event: evento,
+      player: this.playerName,
+      value: valor || 0
+    };
+
+    console.log("JSON enviado:");
+    console.log(JSON.stringify(datos, null, 2));
+
+    this.socket.send(JSON.stringify(datos));
+  }
+
 };
