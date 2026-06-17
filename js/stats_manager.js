@@ -1,6 +1,7 @@
 function StatsManager() {
-  this.playerName = prompt("Ingresá tu nombre") || "Jugador";
+
   this.statsKey = "gameStats";
+
   this.stats = JSON.parse(localStorage.getItem(this.statsKey)) || {
     partidas: 0,
     movimientos: 0,
