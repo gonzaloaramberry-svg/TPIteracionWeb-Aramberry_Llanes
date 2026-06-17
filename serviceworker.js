@@ -1,12 +1,12 @@
 const CACHE_NAME = "2048-cache-v1";
 
 const urlsToCache = [
-  "/",
-  "/index.html",
-  "/style/main.css",
-  "/js/application.js",
-  "/js/game_manager.js",
-  "/js/stats_manager.js"
+  "./",                 
+  "./index.html",        
+  "./style/main.css",   
+  "./js/application.js",
+  "./js/game_manager.js",
+  "./js/stats_manager.js"
 ];
 
 self.addEventListener("install", event => {
