@@ -1,12 +1,6 @@
 function StatsManager() {
-
   this.playerName = prompt("Ingresá tu nombre") || "Jugador";
-
   this.statsKey = "gameStats";
-  };
-
-  this.statsKey = "gameStats";
-
   this.stats = JSON.parse(localStorage.getItem(this.statsKey)) || {
     partidas: 0,
     movimientos: 0,
@@ -15,9 +9,8 @@ function StatsManager() {
     mejorPuntaje: 0,
     combinaciones: 0
   };
-    this.socket = new WebSocket(
-    "wss://echo.websocket.org"
-  );
+
+  this.socket = new WebSocket("wss://gamehubmanager.azurewebsites.net/ws");
 
   this.socket.onopen = function() {
     console.log("WebSocket conectado");
@@ -30,39 +23,29 @@ function StatsManager() {
   this.socket.onclose = function() {
     console.log("WebSocket cerrado");
   };
-   this.socket.onmessage = function(mensaje) {
 
+  this.socket.onmessage = function(mensaje) {
     let datos = JSON.parse(mensaje.data);
+    console.log(JSON.stringify(datos, null, 2));
 
-    console.log(
-      JSON.stringify(datos, null, 2)
-  );
+    if (!Array.isArray(datos))
+      return;
 
-  if (!Array.isArray(datos)) 
-  return;
+    let lista = document.getElementById("ranking-list");
+    lista.innerHTML = "";
 
-
-  let lista = document.getElementById("ranking-list");
-
-  lista.innerHTML = "";
-
-  datos.forEach(function(jugador, index) {
-
-    let item = document.createElement("li");
-
-    item.textContent =
-      (index + 1) +
-      ". " +
-      jugador.Player +
-      " - " +
-      jugador.Value;
-
-    lista.appendChild(item);
-
-  });
-
+    datos.forEach(function(jugador, index) {
+      let item = document.createElement("li");
+      item.textContent =
+        (index + 1) +
+        ". " +
+        jugador.Player +
+        " - " +
+        jugador.Value;
+      lista.appendChild(item);
+    });
   };
-
+}
 
 // Guardar estadísticas
 StatsManager.prototype.guardar = function () {
@@ -71,9 +54,10 @@ StatsManager.prototype.guardar = function () {
 
 // Registrar eventos
 StatsManager.prototype.registrarEvento = function (evento, valor) {
+  console.log(this);
+  console.log(this.stats);
 
-  switch(evento) {
-
+  switch (evento) {
     case "partida":
       this.stats.partidas++;
       break;
@@ -107,18 +91,4 @@ StatsManager.prototype.registrarEvento = function (evento, valor) {
 
   console.log("Evento registrado:", evento);
   console.log(this.stats);
-};
-StatsManager.prototype.enviarEventoWebSocket = function(evento, valor) {
-
-  if (this.socket.readyState === WebSocket.OPEN) {
-
-    const datos = {
-      game: "2048",
-      event: evento,
-      player: this.playername,
-      value: valor || 0
-    };
-
-    this.socket.send(JSON.stringify(datos));
-  }
 };
