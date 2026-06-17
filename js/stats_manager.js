@@ -53,15 +53,13 @@ StatsManager.prototype.guardar = function () {
 };
 
 // Registrar eventos
-StatsManager.prototype.registrarEvento = function (evento, valor) {
-  console.log(this);
+StatsManager.prototype.registrarEvento = function(evento, valor) {
   console.log(this.stats);
 
-  switch (evento) {
+  switch(evento) {
     case "partida":
       this.stats.partidas++;
       break;
-
     case "movimiento":
       this.stats.movimientos++;
       break;
