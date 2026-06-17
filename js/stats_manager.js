@@ -83,10 +83,15 @@ StatsManager.prototype.registrarEvento = function(evento, valor) {
       }
       break;
   }
+StatsManager.prototype.registrarEvento = function(evento, valor) {
 
-  this.enviarEventoWebSocket(evento, valor);
+
 
   this.guardar();
+
+  this.enviarEventoWebSocket(evento, valor); 
+
+};
 
   console.log("Evento registrado:", evento);
   console.log(this.stats);
