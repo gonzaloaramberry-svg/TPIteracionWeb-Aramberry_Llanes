@@ -62,7 +62,7 @@ function StatsManager() {
   });
 
   };
-}
+
 
 // Guardar estadísticas
 StatsManager.prototype.guardar = function () {
