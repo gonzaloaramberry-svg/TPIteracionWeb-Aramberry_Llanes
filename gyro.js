@@ -1,123 +1,53 @@
-// ==============================
-// CONFIGURACIÓN GENERAL
-// ==============================
-let lastMove = 0;
-const cooldown = 400;
+// Control de estado para evitar que las fichas se muevan sin parar
+let controlListo = true; 
 
-// ==============================
-// ACTIVAR GIROSCOPIO (BOTÓN)
-// ==============================
-async function enableGyro() {
+function manejarMovimiento2048(event) {
+  const beta = event.beta;   // Inclinación Adelante/Atrás (Arriba/Abajo)
+  const gamma = event.gamma; // Inclinación Izquierda/Derecha
 
-  // 🔒 Permiso requerido en iOS / Safari
-  if (typeof DeviceOrientationEvent !== "undefined" &&
-      typeof DeviceOrientationEvent.requestPermission === "function") {
+  // Ángulo mínimo de inclinación para activar el movimiento (sensibilidad)
+  const LIMITE_ANGULO = 25; 
+  // Ángulo de retorno para volver a habilitar el control
+  const LIMITE_RETORNO = 10; 
 
-    try {
-      const response = await DeviceOrientationEvent.requestPermission();
-
-      if (response !== "granted") {
-        console.log("❌ Permiso de giroscopio denegado");
-        return;
-      }
-
-    } catch (err) {
-      console.log("Error solicitando permiso:", err);
-      return;
+  // 1. Verificamos si el teléfono regresó al "centro" para desbloquear el próximo movimiento
+  if (!controlListo) {
+    if (Math.abs(gamma) < LIMITE_RETORNO && Math.abs(beta) < LIMITE_RETORNO) {
+      controlListo = true; // El usuario enderezó el teléfono, listo para el siguiente movimiento
     }
+    return; // Si no ha centrado el teléfono, ignoramos el resto del código
   }
 
-  console.log("✔ Giroscopio activado");
+  // 2. Detectar Inclinación Horizontal (Izquierda / Derecha)
+  if (Math.abs(gamma) > LIMITE_ANGULO) {
+    controlListo = false; // Bloqueamos hasta que regrese al centro
+    
+    if (gamma > 0) {
+      ejecutarMovimiento2048("derecha");
+    } else {
+      ejecutarMovimiento2048("izquierda");
+    }
+    return;
+  }
 
-  startGyro();
+  // 3. Detectar Inclinación Vertical (Arriba / Abajo)
+  // Nota: Asumimos que el jugador sostiene el teléfono a unos 45° cómodamente. 
+  // Si lo inclina más hacia adelante o hacia atrás, se toman estos rangos:
+  if (beta > (45 + LIMITE_ANGULO)) {
+    controlListo = false;
+    ejecutarMovimiento2048("abajo");
+  } else if (beta < (45 - LIMITE_ANGULO)) {
+    controlListo = false;
+    ejecutarMovimiento2048("arriba");
+  }
 }
 
-// ==============================
-// INICIAR SENSOR
-// ==============================
-function startGyro() {
-
-  window.addEventListener("deviceorientation", (event) => {
-
-    if (!event.beta || !event.gamma) return;
-
-    const now = Date.now();
-    if (now - lastMove < cooldown) return;
-
-    const beta = event.beta;   // adelante / atrás
-    const gamma = event.gamma; // izquierda / derecha
-
-    let moved = false;
-
-    // 👉 DERECHA
-    if (gamma > 20) {
-      keyboardInputManager.emit("move", 1);
-      moved = true;
-    }
-
-    // 👉 IZQUIERDA
-    else if (gamma < -20) {
-      keyboardInputManager.emit("move", 3);
-      moved = true;
-    }
-
-    // 👉 ABAJO
-    else if (beta > 25) {
-      keyboardInputManager.emit("move", 2);
-      moved = true;
-    }
-
-    // 👉 ARRIBA
-    else if (beta < -25) {
-      keyboardInputManager.emit("move", 0);
-      moved = true;
-    }
-
-    if (moved) {
-      lastMove = now;
-      console.log("MOVE:", beta, gamma);
-    }
-
-  });
+// Conexión con tu juego actual
+function ejecutarMovimiento2048(direccion) {
+  console.log("Moviendo tablero hacia: " + direccion);
+  
+  // AQUÍ LLAMAS A LAS FUNCIONES QUE YA TIENE TU JUEGO. Por ejemplo:
+  // if (direccion === "izquierda") miJuego.moverIzquierda();
+  // O también puedes simular el evento de teclado si tu juego escucha el "keydown":
+  // lanzarEventoTeclado(direccion);
 }
-
-// ==============================
-// CONECTAR BOTÓN HTML
-// ==============================
-document.addEventListener("DOMContentLoaded", () => {
-
-  const btn = document.getElementById("enableGyro");
-
-  if (btn) {
-    btn.addEventListener("click", enableGyro);
-  } else {
-    console.log("Botón enableGyro no encontrado en el DOM");
-  }
-
-});
-
-// ==============================
-// FALLBACK TECLADO (PC)
-// ==============================
-window.addEventListener("keydown", (e) => {
-
-  switch (e.key) {
-
-    case "ArrowLeft":
-      keyboardInputManager.emit("move", 3);
-      break;
-
-    case "ArrowRight":
-      keyboardInputManager.emit("move", 1);
-      break;
-
-    case "ArrowUp":
-      keyboardInputManager.emit("move", 0);
-      break;
-
-    case "ArrowDown":
-      keyboardInputManager.emit("move", 2);
-      break;
-  }
-
-});
