@@ -110,4 +110,4 @@ StatsManager.prototype.enviarEventoWebSocket = function (evento, valor) {
     this.socket.send(JSON.stringify(datos));
   }
 
-};
+}

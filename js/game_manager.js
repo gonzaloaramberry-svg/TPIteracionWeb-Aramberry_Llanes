@@ -21,45 +21,49 @@ GameManager.prototype.restart = function () {
   this.setup();
 };
 
-// Keep playing after winning (allows going over 2048)
+// Cambiar el método:
 GameManager.prototype.keepPlaying = function () {
-  this.keepPlaying = true;
-  this.actuator.continueGame(); // Clear the game won/lost message
+  this.isKeepingPlaying = true;  // ← nombre distinto
+  this.actuator.continueGame();
 };
 
-// Return true if the game is lost, or has won and the user hasn't kept playing
+// Cambiar isGameTerminated:
 GameManager.prototype.isGameTerminated = function () {
-  return this.over || (this.won && !this.keepPlaying);
+  return this.over || (this.won && !this.isKeepingPlaying); // ← idem
 };
 
-// Set up the game
+// Cambiar setup():
 GameManager.prototype.setup = function () {
   var previousState = this.storageManager.getGameState();
 
-  // Reload the game from a previous game if present
-  if (previousState) {
-    this.grid        = new Grid(previousState.grid.size,
-                                previousState.grid.cells); // Reload grid
-    this.score       = previousState.score;
-    this.over        = previousState.over;
-    this.won         = previousState.won;
-    this.keepPlaying = previousState.keepPlaying;
+ if (previousState) {
+    this.grid             = new Grid(previousState.grid.size, previousState.grid.cells);
+    this.score            = previousState.score;
+    this.over             = previousState.over;
+    this.won              = previousState.won;
+    this.isKeepingPlaying = previousState.keepPlaying; // ← idem
   } else {
-    this.grid        = new Grid(this.size);
-    this.score       = 0;
-    this.over        = false;
-    this.won         = false;
-    this.keepPlaying = false;
-    if(!previousState){
-      this.statsmanager.registrarEvento("partida");
-    }
-    
-    // Add the initial tiles
+    this.grid             = new Grid(this.size);
+    this.score            = 0;
+    this.over             = false;
+    this.won              = false;
+    this.isKeepingPlaying = false; // ← idem
+    this.statsmanager.registrarEvento("partida"); // if redundante eliminado
     this.addStartTiles();
   }
 
-  // Update the actuator
-  this.actuate();
+ this.actuate();
+};
+
+// Cambiar serialize():
+GameManager.prototype.serialize = function () {
+  return {
+    grid:        this.grid.serialize(),
+    score:       this.score,
+    over:        this.over,
+    won:         this.won,
+    keepPlaying: this.isKeepingPlaying // ← idem
+  };
 };
 
 // Set up the initial tiles to start the game with
@@ -110,7 +114,7 @@ GameManager.prototype.serialize = function () {
     score:       this.score,
     over:        this.over,
     won:         this.won,
-    keepPlaying: this.keepPlaying
+    keepPlaying: this.isKeepingPlaying
   };
 };
 
