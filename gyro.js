@@ -1,40 +1,40 @@
-let controls = {
-  tiltLeft: "moveLeft",
-  tiltRight: "moveRight",
-  tiltUp: "moveUp",
-  tiltDown: "moveDown"
-};
-
+// ==============================
+// CONFIGURACIÓN GENERAL
+// ==============================
 let lastMove = 0;
+const cooldown = 400;
 
-// ==========================
-// ACTIVAR GIRO (PERMISO)
-// ==========================
+// ==============================
+// ACTIVAR GIROSCOPIO (BOTÓN)
+// ==============================
 async function enableGyro() {
 
+  // 🔒 Permiso requerido en iOS / Safari
   if (typeof DeviceOrientationEvent !== "undefined" &&
       typeof DeviceOrientationEvent.requestPermission === "function") {
 
     try {
-      const res = await DeviceOrientationEvent.requestPermission();
+      const response = await DeviceOrientationEvent.requestPermission();
 
-      if (res !== "granted") {
-        console.log("Permiso denegado");
+      if (response !== "granted") {
+        console.log("❌ Permiso de giroscopio denegado");
         return;
       }
-    } catch (e) {
-      console.log("Error permiso:", e);
+
+    } catch (err) {
+      console.log("Error solicitando permiso:", err);
       return;
     }
   }
 
   console.log("✔ Giroscopio activado");
+
   startGyro();
 }
 
-// ==========================
+// ==============================
 // INICIAR SENSOR
-// ==========================
+// ==============================
 function startGyro() {
 
   window.addEventListener("deviceorientation", (event) => {
@@ -42,52 +42,67 @@ function startGyro() {
     if (!event.beta || !event.gamma) return;
 
     const now = Date.now();
-    if (now - lastMove < 400) return;
+    if (now - lastMove < cooldown) return;
 
-    let beta = event.beta;
-    let gamma = event.gamma;
+    const beta = event.beta;   // adelante / atrás
+    const gamma = event.gamma; // izquierda / derecha
 
-    // derecha
+    let moved = false;
+
+    // 👉 DERECHA
     if (gamma > 20) {
       keyboardInputManager.emit("move", 1);
-      lastMove = now;
+      moved = true;
     }
 
-    // izquierda
+    // 👉 IZQUIERDA
     else if (gamma < -20) {
       keyboardInputManager.emit("move", 3);
-      lastMove = now;
+      moved = true;
     }
 
-    // abajo
-    else if (beta > 20) {
+    // 👉 ABAJO
+    else if (beta > 25) {
       keyboardInputManager.emit("move", 2);
-      lastMove = now;
+      moved = true;
     }
 
-    // arriba
-    else if (beta < -20) {
+    // 👉 ARRIBA
+    else if (beta < -25) {
       keyboardInputManager.emit("move", 0);
+      moved = true;
+    }
+
+    if (moved) {
       lastMove = now;
+      console.log("MOVE:", beta, gamma);
     }
 
   });
 }
 
-// ==========================
-// BOTÓN
-// ==========================
+// ==============================
+// CONECTAR BOTÓN HTML
+// ==============================
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("enableGyro")
-    .addEventListener("click", enableGyro);
+
+  const btn = document.getElementById("enableGyro");
+
+  if (btn) {
+    btn.addEventListener("click", enableGyro);
+  } else {
+    console.log("Botón enableGyro no encontrado en el DOM");
+  }
+
 });
 
-// ==========================
+// ==============================
 // FALLBACK TECLADO (PC)
-// ==========================
+// ==============================
 window.addEventListener("keydown", (e) => {
 
   switch (e.key) {
+
     case "ArrowLeft":
       keyboardInputManager.emit("move", 3);
       break;
