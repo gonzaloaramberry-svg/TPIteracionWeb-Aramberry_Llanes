@@ -1,4 +1,10 @@
-// Wait till the browser is ready to render the game (avoids glitches)
+var juego2048;
+
 window.requestAnimationFrame(function () {
-  new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+  juego2048 = new GameManager(
+    4,
+    KeyboardInputManager,
+    HTMLActuator,
+    LocalStorageManager
+  );
 });
