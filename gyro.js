@@ -1,27 +1,33 @@
 function startGyro() {
-  window.addEventListener("deviceorientation", (e) => {
-    console.log("gyro activo:", e.alpha, e.beta, e.gamma);
+  window.addEventListener("deviceorientation", (event) => {
+    console.log("gyro iOS:",
+      event.alpha,
+      event.beta,
+      event.gamma
+    );
   });
 }
 
-// 🔐 PERMISO (OBLIGATORIO en muchos celulares modernos)
-if (typeof DeviceOrientationEvent.requestPermission === "function") {
-  const btn = document.createElement("button");
-  btn.innerText = "Activar giroscopio";
-  document.body.appendChild(btn);
+//  iOS requiere permiso SI O SI
+async function initGyroIOS() {
+  if (typeof DeviceOrientationEvent !== "undefined" &&
+      typeof DeviceOrientationEvent.requestPermission === "function") {
 
-  btn.addEventListener("click", () => {
-    DeviceOrientationEvent.requestPermission()
-      .then((state) => {
-        if (state === "granted") {
-          startGyro();
-        } else {
-          console.log("Permiso denegado");
-        }
-      })
-      .catch(console.error);
-  });
-} else {
-  // celulares que no piden permiso
-  startGyro();
+    try {
+      const permission = await DeviceOrientationEvent.requestPermission();
+
+      if (permission === "granted") {
+        startGyro();
+      } else {
+        console.log("Permiso denegado en iOS");
+      }
+
+    } catch (err) {
+      console.error("Error pidiendo permiso iOS:", err);
+    }
+
+  } else {
+    // Android o navegadores que no requieren permiso
+    startGyro();
+  }
 }
