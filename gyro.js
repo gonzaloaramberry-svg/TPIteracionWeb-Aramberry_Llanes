@@ -1,15 +1,19 @@
 function startGyro() {
   window.addEventListener("deviceorientation", (event) => {
-    console.log("gyro iOS:",
-      event.alpha,
-      event.beta,
-      event.gamma
-    );
+    const alpha = event.alpha;
+    const beta = event.beta;
+    const gamma = event.gamma;
+
+    if (alpha !== null && beta !== null && gamma !== null) {
+      console.log(
+        `Ejes -> Alpha: ${alpha.toFixed(2)}, Beta: ${beta.toFixed(2)}, Gamma: ${gamma.toFixed(2)}`
+      );
+    }
   });
 }
 
-//  iOS requiere permiso SI O SI
-async function initGyroIOS() {
+//  iOS + Android compatible init
+async function initGyro() {
   if (typeof DeviceOrientationEvent !== "undefined" &&
       typeof DeviceOrientationEvent.requestPermission === "function") {
 
@@ -19,15 +23,14 @@ async function initGyroIOS() {
       if (permission === "granted") {
         startGyro();
       } else {
-        console.log("Permiso denegado en iOS");
+        console.log("Permiso denegado");
       }
 
-    } catch (err) {
-      console.error("Error pidiendo permiso iOS:", err);
+    } catch (e) {
+      console.error("Error en permiso iOS:", e);
     }
 
   } else {
-    // Android o navegadores que no requieren permiso
     startGyro();
   }
 }
