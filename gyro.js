@@ -1,36 +1,17 @@
-function startGyro() {
-  window.addEventListener("deviceorientation", (event) => {
-    const alpha = event.alpha;
-    const beta = event.beta;
-    const gamma = event.gamma;
+const GyroscopeController = (() => {
+  const AXIS_KEYS = ['alpha', 'beta', 'gamma'];
 
-    if (alpha !== null && beta !== null && gamma !== null) {
-      console.log(
-        `Ejes -> Alpha: ${alpha.toFixed(2)}, Beta: ${beta.toFixed(2)}, Gamma: ${gamma.toFixed(2)}`
-      );
-    }
-  });
-}
+  let config = {
+    axisX: 'gamma',
+    axisY: 'beta',
+    sensitivity: 1.5,
+    invertX: false,
+    invertY: false,
+    useKeyboard: true,
+  };
 
-//  iOS + Android compatible init
-async function initGyro() {
-  if (typeof DeviceOrientationEvent !== "undefined" &&
-      typeof DeviceOrientationEvent.requestPermission === "function") {
-
-    try {
-      const permission = await DeviceOrientationEvent.requestPermission();
-
-      if (permission === "granted") {
-        startGyro();
-      } else {
-        console.log("Permiso denegado");
-      }
-
-    } catch (e) {
-      console.error("Error en permiso iOS:", e);
-    }
-
-  } else {
-    startGyro();
-  }
-}
+    let calibration = { alpha: 0, beta: 0, gamma: 0 };
+    let raw = { alpha: 0, beta: 0, gamma: 0 };
+    let output = { x: 0, y: 0 };
+    let enabled = false;
+    let permissionGranted = false;
