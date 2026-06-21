@@ -1,6 +1,6 @@
 (function () {
   var TILT_THRESHOLD = 40;
-  var COOLDOWN_MS = 250;
+  var COOLDOWN_MS = 150;
   var CALIBRATION_SAMPLES = 50;
 
   var active = false;
